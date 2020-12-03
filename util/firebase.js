@@ -1,13 +1,19 @@
+const functions = require('firebase-functions');
 var admin = require('firebase-admin');
 // Firebase App (the core Firebase SDK) is always required and
 // must be listed before other Firebase SDKs
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: "https://pokemonapi-5ae54.firebaseio.com"
+  });
+  
 var firebase = require("firebase/app");
 
 // Add the Firebase products that you want to use
 require("firebase/auth");
 require("firebase/firestore");
 
-var serviceAccount = require("path/to/serviceAccountKey.json");
+// var serviceAccount = require("path/to/serviceAccountKey.json");
 
 // TODO: Replace the following with your app's Firebase project configuration
 // For Firebase JavaScript SDK v7.20.0 and later, `measurementId` is an optional field
@@ -22,14 +28,14 @@ var firebaseConfig = {
     measurementId: "G-QPTLJ2BQ9P"
   };
   
+  console.log("what the heck")
   // Initialize Firebase
-firebase.initializeApp(firebaseConfig);
+  firebase.initializeApp(firebaseConfig);
+  console.log(firebase)
 
-admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-    databaseURL: "https://pokemonapi-5ae54.firebaseio.com"
-  });
 
-var app = admin.initializeApp();
+// var app = admin.initializeApp();
 
-module.exports = app;
+var storage = firebase.storage();
+
+module.exports = storage

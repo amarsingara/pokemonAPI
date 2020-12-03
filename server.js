@@ -5,7 +5,8 @@ const port = process.env.PORT || 4444;
 
 const jwt = require('jsonwebtoken');
 const db = require('./util/database');
-let fb= require('./util/firebase');
+
+let fb = require('./util/firebase');
 
 
 
@@ -356,7 +357,7 @@ app.post("/api/trainer/image", function(req, res)
     console.log(reference)
 
     let urlRef = getUrl(reference);
-    
+
     console.log(urlRef);
     // db.query("CALL insertTrainer(?,?,?,?,?)", [req.user.trainerId, image], function (err, result) 
     // {
