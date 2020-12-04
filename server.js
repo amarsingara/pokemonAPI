@@ -7,6 +7,8 @@ const jwt = require('jsonwebtoken');
 const db = require('./util/database');
 express.static(root, [options]);
 
+
+// https://pokeapi-amar-john.herokuapp.com/
 // let fb = require('./util/firebase');
 
 
