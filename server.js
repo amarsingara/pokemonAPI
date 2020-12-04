@@ -8,9 +8,6 @@ const jwt = require('jsonwebtoken');
 const db = require('./util/database');
 
 
-
-
-// https://pokeapi-amar-john.herokuapp.com/
 // let fb = require('./util/firebase');
 
 
@@ -66,7 +63,7 @@ app.use((req, res, next) => {
     }
 })
 
-app.get("/api/trainer", (req, res) => 
+app.get("/trainer", (req, res) => 
 {
     db.query("CALL getTrainer(?)", [req.user.trainerId], function (err, result) 
     {
@@ -87,7 +84,7 @@ app.get("/api/trainer", (req, res) =>
     });
 });
 
-app.get("/api/party", (req, res) => 
+app.get("/party", (req, res) => 
 {
     db.query("CALL getParty(?)", [req.user.trainerId], function (err, result) {
         console.log(result)
@@ -104,7 +101,7 @@ app.get("/api/party", (req, res) =>
 });
 
 
-app.get("/api/party/id", (req, res) => 
+app.get("/party/id", (req, res) => 
 {
     db.query("CALL getPartyId(?)", [req.user.trainerId], function (err, result) {
         console.log(result)
@@ -121,7 +118,7 @@ app.get("/api/party/id", (req, res) =>
 });
 
 
-app.get("/api/party/create", (req, res) => 
+app.get("/party/create", (req, res) => 
 {
     db.query("CALL getPartyId(?)", [req.user.trainerId], function (err, result) {
         if(err){
@@ -145,7 +142,7 @@ app.get("/api/party/create", (req, res) =>
     });
 });
 
-app.put("/api/party/add", (req, res) => 
+app.put("/party/add", (req, res) => 
 {
     let pokeNo = req.body.pokeNo;
     
@@ -177,7 +174,7 @@ app.put("/api/party/add", (req, res) =>
     });
 });
 
-app.delete("/api/party/delete", (req, res) => 
+app.delete("/party/delete", (req, res) => 
 {
     let pokeNo = req.body.pokeNo;
 
@@ -205,7 +202,7 @@ app.delete("/api/party/delete", (req, res) =>
 });
 
 
-app.get("/api/pokemon", (req, res) => 
+app.get("/pokemon", (req, res) => 
 {   
     db.query("CALL getPokemon(?)", [req.headers.pokeno], function (err, result) 
     {
@@ -226,7 +223,7 @@ app.get("/api/pokemon", (req, res) =>
     });
 });
 
-app.post("/api/trainer/create", function(req, res) 
+app.post("/trainer/create", function(req, res) 
 {
     let firstName = req.body.firstName;
     let lastName = req.body.lastName;
@@ -252,7 +249,7 @@ app.post("/api/trainer/create", function(req, res)
     });
 });
 
-app.put("/api/trainer/update", function(req, res) 
+app.put("/trainer/update", function(req, res) 
 {
     let firstName = req.body.firstName;
     let lastName = req.body.lastName;
@@ -278,7 +275,7 @@ app.put("/api/trainer/update", function(req, res)
     });
 });
 
-app.delete("/api/trainer/delete", (req, res) => 
+app.delete("/trainer/delete", (req, res) => 
 {
     let password = req.body.password;
     db.query("CALL deleteTrainer(?,?)", [req.user.trainerId, password], function (err, result) {
@@ -296,7 +293,7 @@ app.delete("/api/trainer/delete", (req, res) =>
     });
 });
 
-app.put("/api/pokemon/update", function(req, res) 
+app.put("/pokemon/update", function(req, res) 
 {
     let pokeNo = req.body.pokeNo;
     let name = req.body.name;
@@ -334,7 +331,7 @@ app.put("/api/pokemon/update", function(req, res)
 });
 
 // Probably in the future want to require admin level key or something
-app.delete("/api/pokemon/delete", (req, res) => 
+app.delete("/pokemon/delete", (req, res) => 
 {
     let pokeNo = req.body.pokeNo;
     db.query("CALL deletePokemon(?)", [pokeNo], function (err, result) {
@@ -352,7 +349,7 @@ app.delete("/api/pokemon/delete", (req, res) =>
     });
 });
 
-app.post("/api/pokemon/create", function(req, res) 
+app.post("/pokemon/create", function(req, res) 
 {
     let pokeNo = req.body.pokeNo;
     let name = req.body.name;
@@ -391,7 +388,7 @@ app.post("/api/pokemon/create", function(req, res)
 
 
 
-app.post("/api/trainer/image", function(req, res) 
+app.post("/trainer/image", function(req, res) 
 {
     console.log("successfully made it to endpoint");
     console.log(req.body.image);
