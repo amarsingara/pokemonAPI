@@ -24,7 +24,7 @@ app.use((req, res, next) =>
 });
   
 //initial login
-app.get("/api/v1/login", (req, res) => 
+app.get("/login", (req, res) => 
 {
 
     db.query("CALL authUser(?,?)", [req.headers.email, req.headers.password], function (err, result) {
@@ -45,6 +45,46 @@ app.get("/api/v1/login", (req, res) =>
     });
 })
 
+app.post("/trainer/create", function(req, res) 
+{
+    let firstName = req.body.firstName;
+    let lastName = req.body.lastName;
+    let password = req.body.password;
+    let email = req.body.email;
+    let userName = req.body.userName;
+    db.query("CALL insertTrainer(?,?,?,?,?)", [firstName, lastName, password, email, userName], function (err, result) 
+    {
+        if(err)
+        {
+            res.status(500).json({error: "Server Failure"});
+        }
+        else if(result[0][0].message) 
+        {
+            console.log(result[0][0])
+            db.query("CALL authUser(?,?)", [email, password], function (err, result) {
+                if(err){
+                    res.status(500).json({error: "Server Failure"});
+                }
+                else if(result[0][0] != null) {
+                    let user = JSON.parse(JSON.stringify(result));
+                    console.log(user[0][0]);
+                    res.status(200).json({token: 
+                        jwt.sign({
+                            trainerId: user[0][0].trainerId,
+                        }, 'MYSECRETKEY')
+                    })
+                } else {
+                    return res.status(401).json({message: 'No Such User'});
+                }
+            });   
+        } 
+        else 
+        {
+            res.status(401).json({message: 'Trainer already exists'});
+        }
+    });
+});
+
 // middleware jwt token to see if user is legit
 // any end point past this will not work if user is not auth
 app.use((req, res, next) => {
@@ -63,7 +103,7 @@ app.use((req, res, next) => {
     }
 })
 
-app.get("/api/v1/trainer", (req, res) => 
+app.get("/trainer", (req, res) => 
 {
     db.query("CALL getTrainer(?)", [req.user.trainerId], function (err, result) 
     {
@@ -84,7 +124,7 @@ app.get("/api/v1/trainer", (req, res) =>
     });
 });
 
-app.get("/api/v1/party", (req, res) => 
+app.get("/party", (req, res) => 
 {
     db.query("CALL getParty(?)", [req.user.trainerId], function (err, result) {
         console.log(result)
@@ -101,7 +141,7 @@ app.get("/api/v1/party", (req, res) =>
 });
 
 
-app.get("/api/v1/party/id", (req, res) => 
+app.get("/party/id", (req, res) => 
 {
     db.query("CALL getPartyId(?)", [req.user.trainerId], function (err, result) {
         console.log(result)
@@ -118,7 +158,7 @@ app.get("/api/v1/party/id", (req, res) =>
 });
 
 
-app.get("/api/v1/party/create", (req, res) => 
+app.get("/party/create", (req, res) => 
 {
     db.query("CALL getPartyId(?)", [req.user.trainerId], function (err, result) {
         if(err){
@@ -142,7 +182,7 @@ app.get("/api/v1/party/create", (req, res) =>
     });
 });
 
-app.put("/api/v1/party/add", (req, res) => 
+app.put("/party/add", (req, res) => 
 {
     let pokeNo = req.body.pokeNo;
     
@@ -174,7 +214,7 @@ app.put("/api/v1/party/add", (req, res) =>
     });
 });
 
-app.delete("/api/v1/party/delete", (req, res) => 
+app.delete("/party/delete", (req, res) => 
 {
     let pokeNo = req.body.pokeNo;
 
@@ -202,7 +242,7 @@ app.delete("/api/v1/party/delete", (req, res) =>
 });
 
 
-app.get("/api/v1/pokemon", (req, res) => 
+app.get("/pokemon", (req, res) => 
 {   
     db.query("CALL getPokemon(?)", [req.headers.pokeno], function (err, result) 
     {
@@ -223,33 +263,9 @@ app.get("/api/v1/pokemon", (req, res) =>
     });
 });
 
-app.post("/api/v1/trainer/create", function(req, res) 
-{
-    let firstName = req.body.firstName;
-    let lastName = req.body.lastName;
-    let password = req.body.password;
-    let email = req.body.email;
-    let userName = req.body.userName;
-    db.query("CALL insertTrainer(?,?,?,?,?)", [firstName, lastName, password, email ,userName], function (err, result) 
-    {
-        if(err)
-        {
-            res.status(500).json({error: "Server Failure"});
-        }
-        else if(result[0] != null) 
-        {
-            console.log(result);
-            let trainer = JSON.parse(JSON.stringify(result));
-            return res.status(200).json({trainer: trainer[0]});
-        } 
-        else 
-        {
-            res.status(401).json({message: 'Failed to become a trainer'});
-        }
-    });
-});
 
-app.put("/api/v1/trainer/update", function(req, res) 
+
+app.put("/trainer/update", function(req, res) 
 {
     let firstName = req.body.firstName;
     let lastName = req.body.lastName;
@@ -262,11 +278,11 @@ app.put("/api/v1/trainer/update", function(req, res)
             console.log(err)
             res.status(500).json({error: "Server Failure"});
         }
-        else if(result[0] != null) 
+        else if(result[0][0] != null) 
         {
             console.log(result);
             let trainer = JSON.parse(JSON.stringify(result));
-            return res.status(200).json({trainer: trainer[0]});
+            return res.status(200).json({trainer: trainer[0][0]});
         } 
         else 
         {
@@ -275,7 +291,7 @@ app.put("/api/v1/trainer/update", function(req, res)
     });
 });
 
-app.delete("/api/v1/trainer/delete", (req, res) => 
+app.delete("/trainer/delete", (req, res) => 
 {
     let password = req.body.password;
     db.query("CALL deleteTrainer(?,?)", [req.user.trainerId, password], function (err, result) {
@@ -283,17 +299,18 @@ app.delete("/api/v1/trainer/delete", (req, res) =>
             console.log(err);
             res.status(500).json({error: "Server Failure"});
         }
-        else if(result[0] != null) {
+        else if(result[0][0] != null) {
             let deletedTrainer = JSON.parse(JSON.stringify(result));
-            return res.status(200).json({deletedTrainer: deletedTrainer[0]});
+            console.log(deletedTrainer)
+            return res.status(200).json({deletedTrainer: deletedTrainer[0][0]});
         } else {
-            res.status(401).json({message: 'No Such User Exists'});
+            res.status(401).json({message: 'Password Update Failed'});
         }
         
     });
 });
 
-app.put("/api/v1/pokemon/update", function(req, res) 
+app.put("/pokemon/update", function(req, res) 
 {
     let pokeNo = req.body.pokeNo;
     let name = req.body.name;
@@ -331,7 +348,7 @@ app.put("/api/v1/pokemon/update", function(req, res)
 });
 
 // Probably in the future want to require admin level key or something
-app.delete("/api/v1/pokemon/delete", (req, res) => 
+app.delete("/pokemon/delete", (req, res) => 
 {
     let pokeNo = req.body.pokeNo;
     db.query("CALL deletePokemon(?)", [pokeNo], function (err, result) {
@@ -349,7 +366,7 @@ app.delete("/api/v1/pokemon/delete", (req, res) =>
     });
 });
 
-app.post("/api/v1/pokemon/create", function(req, res) 
+app.post("/pokemon/create", function(req, res) 
 {
     let pokeNo = req.body.pokeNo;
     let name = req.body.name;
@@ -388,7 +405,7 @@ app.post("/api/v1/pokemon/create", function(req, res)
 
 
 
-app.post("/api/v1/trainer/image", function(req, res) 
+app.post("/trainer/image", function(req, res) 
 {
     console.log("successfully made it to endpoint");
     console.log(req.body.image);
