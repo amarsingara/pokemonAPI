@@ -5,12 +5,14 @@ const port = process.env.PORT || 4444;
 
 const jwt = require('jsonwebtoken');
 const db = require('./util/database');
+express.static(root, [options]);
 
-let fb = require('./util/firebase');
+// let fb = require('./util/firebase');
 
 
 
-app.use(parser.json())
+app.use(parser.json());
+app.use(express.static('public'));
 app.use((req, res, next) => 
 {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -345,6 +347,45 @@ app.delete("/api/pokemon/delete", (req, res) =>
         
     });
 });
+
+app.post("/api/pokemon/create", function(req, res) 
+{
+    let pokeNo = req.body.pokeNo;
+    let name = req.body.name;
+    let type1 = req.body.type1;
+    let type2 = req.body.type2;
+    let total = req.body.total;
+    let hp = req.body.hp;
+    let attack = req.body.attack;
+    let defense = req.body.defense;
+    let spec_atk = req.body.spec_atk;
+    let spec_def = req.body.spec_def;
+    let speed = req.body.speed;
+    let generation = req.body.generation;
+    let legendary = req.body.legendary;
+
+    db.query("CALL insertPokemon(?,?,?,?,?,?,?,?,?,?,?,?,?)", [pokeNo, name ,type1 ,type2 ,total ,hp ,attack ,defense ,spec_atk ,spec_def ,speed ,generation ,legendary
+    ], function (err, result) 
+    {
+        if(err)
+        {
+            console.log(err)
+            res.status(500).json({error: "Server Failure"});
+        }
+        else if(result[0] != null) 
+        {
+            console.log(result);
+            let trainer = JSON.parse(JSON.stringify(result));
+            return res.status(200).json({trainer: trainer[0]});
+        } 
+        else 
+        {
+            res.status(401).json({message: 'This pokemon does not Exist'});
+        }
+    });
+});
+
+
 
 app.post("/api/trainer/image", function(req, res) 
 {
