@@ -5,7 +5,8 @@ const port = process.env.PORT || 4444;
 
 const jwt = require('jsonwebtoken');
 const db = require('./util/database');
-express.static(root, [options]);
+
+
 
 
 // https://pokeapi-amar-john.herokuapp.com/
@@ -14,7 +15,7 @@ express.static(root, [options]);
 
 
 app.use(parser.json());
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
 app.use((req, res, next) => 
 {
     res.setHeader('Access-Control-Allow-Origin', '*');
